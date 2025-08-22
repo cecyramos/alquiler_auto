@@ -1,23 +1,46 @@
 -- Consulta 1 --
 /*Mostrar el nombre, telefono y email de todos los clientes que tienen un alquiler activo 
 (es decir, cuya fecha actual esté dentro del rango entre fecha_inicio y fecha_fin).*/
+SELECT clientes.nombre, clientes.telefono, clientes.email
+FROM clientes
+INNER JOIN alquileres ON clientes.id_cliente = alquileres.id_cliente
+WHERE alquileres.fecha_inicio <= CURDATE() AND alquileres.fecha_fin >= CURDATE();
 
 -- Consulta 2 --
 /*Mostrar los vehículos que se alquilaron en el mes de marzo de 2025. Debe mostrar el 
 modelo, marca, y precio_dia de esos vehículos.*/
+SELECT vehiculos.modelo, vehiculos.marca, vehiculos.precio_dia
+FROM vehiculos
+INNER JOIN alquileres ON vehiculos.id_vehiculo = alquileres.id_vehiculo
+WHERE MONTH(alquileres.fecha_inicio) = 3 AND YEAR(alquileres.fecha_inicio) = 2025;
 
 -- Consulta 3 --
 /*Calcular el precio total del alquiler para cada cliente, considerando el número de 
 días que alquiló el vehículo (el precio por día de cada vehículo multiplicado por la 
 cantidad de días de alquiler).*/
+SELECT clientes.nombre, SUM(vehiculos.precio_dia * DATEDIFF(alquileres.fecha_fin, alquileres.fecha_inicio)) AS precio_total
+FROM clientes
+INNER JOIN alquileres ON clientes.id_cliente = alquileres.id_cliente
+INNER JOIN vehiculos ON alquileres.id_vehiculo = vehiculos.id_vehiculo
+GROUP BY clientes.id_cliente;
 
 -- Consulta 4 --
 /*Encontrar los clientes que no han realizado ningún pago (no tienen registros en la 
 tabla Pagos). Muestra su nombre y email.*/
+SELECT clientes.nombre, clientes.email
+FROM clientes
+INNER JOIN alquileres ON clientes.id_cliente = alquileres.id_cliente
+LEFT JOIN pagos ON alquileres.id_alquiler = pagos.id_alquiler
+WHERE pagos.id_pago IS NULL;
 
 -- Consulta 5 --
 /*Calcular el promedio de los pagos realizados por cada cliente. Muestra el nombre del 
 cliente y el promedio de pago.*/
+SELECT clientes.nombre, AVG(pagos.monto) AS promedio_pago
+FROM clientes
+INNER JOIN alquileres ON clientes.id_cliente = alquileres.id_cliente
+INNER JOIN pagos ON alquileres.id_alquiler = pagos.id_alquiler
+GROUP BY clientes.id_cliente;
 
 -- Consulta 6 --
 /*Mostrar los vehículos que están disponibles para alquilar en una fecha específica 
