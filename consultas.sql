@@ -46,9 +46,13 @@ GROUP BY clientes.id_cliente;
 /*Mostrar los vehículos que están disponibles para alquilar en una fecha específica 
 (por ejemplo, 2025-03-18). Debe mostrar el modelo, marca y precio_dia. Si el vehículo 
 está ocupado, no se debe incluir.*/
-SELECT v.modelo, v.marca, v.precio_dia
-FROM vehiculos v LEFT JOIN alquileres a ON v.id_vehiculo = a.id_vehiculo
-WHERE a.fecha_fin < '2025-03-18';
+SELECT v.marca, v.modelo, v.precio_dia
+FROM vehiculos v
+WHERE v.id_vehiculo NOT IN (
+    SELECT a.id_vehiculo
+    FROM alquileres a
+    WHERE '2025-03-18' BETWEEN a.fecha_inicio AND a.fecha_fin
+);
 
 -- Consulta 7 --
 /*Encontrar la marca y el modelo de los vehículos que se alquilaron más de una vez en 
