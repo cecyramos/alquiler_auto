@@ -46,20 +46,38 @@ GROUP BY clientes.id_cliente;
 /*Mostrar los vehículos que están disponibles para alquilar en una fecha específica 
 (por ejemplo, 2025-03-18). Debe mostrar el modelo, marca y precio_dia. Si el vehículo 
 está ocupado, no se debe incluir.*/
+SELECT v.modelo, v.marca, v.precio_dia
+FROM vehiculos v LEFT JOIN alquileres a ON v.id_vehiculo = a.id_vehiculo
+WHERE a.fecha_fin < '2025-03-18';
 
 -- Consulta 7 --
 /*Encontrar la marca y el modelo de los vehículos que se alquilaron más de una vez en 
 el mes de marzo de 2025.*/
+SELECT v.marca, v.modelo, COUNT(a.id_vehiculo) AS veces_alquilado
+FROM vehiculos v JOIN alquileres a ON v.id_vehiculo = a.id_vehiculo
+WHERE MONTH(a.fecha_inicio) = 3 AND YEAR(a.fecha_inicio) = 2025 
+GROUP BY a.id_vehiculo
+HAVING veces_alquilado > 1;
 
 -- Consulta 8 --
 /*Mostrar el total de monto pagado por cada cliente. Debe mostrar el nombre del cliente
  y la cantidad total de pagos realizados (suma del monto de los pagos).*/
+SELECT c.nombre, SUM(p.monto) AS total_pagado
+FROM alquileres a join clientes c ON a.id_cliente = c.id_cliente  join pagos p ON a.id_alquiler = p.id_alquiler
+GROUP BY c.id_cliente;
 
 -- Consulta 9 --
 /*Mostrar los clientes que alquilaron el vehículo Ford Focus (con id_vehiculo = 3). Debe 
 mostrar el nombre del cliente y la fecha del alquiler.*/
+SELECT c.nombre, a.fecha_inicio AS fecha_alquiler
+FROM clientes c JOIN alquileres a ON c.id_cliente = a.id_cliente
+WHERE a.id_vehiculo = 3;
 
 -- Consulta 10 --
 /*Realizar una consulta que muestre el nombre del cliente y el total de días alquilados 
 de cada cliente, ordenado de mayor a menor total de días. El total de días es calculado 
 como la diferencia entre fecha_inicio y fecha_fin.*/
+SELECT c.nombre, SUM(DATEDIFF(a.fecha_fin, a.fecha_inicio)) AS total_dias
+FROM clientes c JOIN alquileres a ON c.id_cliente = a.id_cliente
+GROUP BY c.id_cliente
+ORDER BY total_dias DESC;
